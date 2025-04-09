@@ -36,7 +36,7 @@ class HandTracker:
 
         if self.results.multi_hand_landmarks:
             if len(self.results.multi_hand_landmarks) > hand_number:
-                hand = self.results.multi_hand_landmarks(hand_number)
+                hand = self.results.multi_hand_landmarks[hand_number]
                 for id, landmark in enumerate(hand.landmark):
                     height, width, _ = frame.shape
                     cx, cy = int(landmark.x * width), int(landmark.y * height)
