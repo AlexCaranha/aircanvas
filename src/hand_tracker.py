@@ -14,22 +14,35 @@ class HandTracker:
         self.mp_draw = mp.solutions.drawing_utils
 
     def find_hands(self, frame, draw=True):
-        # convert bgr to rgb
+        # Convert BGR to RGB
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-        # process the frame
+    
+        # Process the frame
         self.results = self.hands.process(rgb_frame)
-
+    
         if self.results.multi_hand_landmarks:
             for hand_landmarks in self.results.multi_hand_landmarks:
                 if draw:
+                    landmarks_style = self.mp_draw.DrawingSpec(
+                        color=(255, 255, 255),  # White
+                        thickness=2,
+                        circle_radius=6
+                    )
+                    connections_style = self.mp_draw.DrawingSpec(
+                        color=(255, 255, 255),  # White
+                        thickness=1,
+                        circle_radius=2
+                    )
+
                     self.mp_draw.draw_landmarks(
                         frame,
                         hand_landmarks,
-                        self.mp_hands.HAND_CONNECTIONS
+                        self.mp_hands.HAND_CONNECTIONS,
+                        landmarks_style,
+                        connections_style
                     )
-
-        return frame 
+                    
+        return frame
     
     def get_hand_position(self, frame, hand_number=0):
         landmark_list = []
