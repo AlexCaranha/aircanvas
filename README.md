@@ -10,8 +10,8 @@ AirCanvas is a computer vision project that lets you draw using hand gestures. B
 - [x] Basic configuration
 
 ## Phase 2: Hand Tracking 🔄
-- [ ] MediaPipe integration
-- [ ] Landmark detection
+- [x] MediaPipe integration
+- [x] Landmark detection
 - [ ] Coordinate system
 - [ ] Real-time tracking
 
