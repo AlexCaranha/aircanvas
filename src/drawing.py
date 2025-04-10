@@ -7,8 +7,8 @@ class DrawingCanvas:
         self.temp_canvas = np.zeros_like(self.canvas)
 
         self.colour = (0, 0, 255) 
-        self.thickness = 20
-        self.eraser_thickness = 100
+        self.thickness = 10
+        self.eraser_thickness = 50
 
         self.current_tool = "pen"
         self.drawing = False

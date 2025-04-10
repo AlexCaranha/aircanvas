@@ -64,8 +64,16 @@ def main():
                 canvas.set_tool("pen")  # Reset to pen when not drawing
         
         # Combine canvas with camera feed
+        # Draw canvas content
         drawing_display = canvas.get_display()
-        frame = cv2.addWeighted(frame, 1.0, drawing_display, 1.0, 0)
+        # Only show camera feed where there is no drawing
+        mask = cv2.cvtColor(drawing_display, cv2.COLOR_BGR2GRAY)
+        mask = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)[1]
+        
+        # Combine the camera feed and drawing
+        frame_bg = cv2.bitwise_and(frame, frame, mask=cv2.bitwise_not(mask))
+        drawing_fg = cv2.bitwise_and(drawing_display, drawing_display, mask=mask)
+        frame = cv2.add(frame_bg, drawing_fg)
         
         # Add UI elements
         cv2.putText(frame, f"Gesture: {gesture.value}", (10, 30),
