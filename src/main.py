@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 from config import *
 from hand_tracker import HandTracker
 
@@ -14,6 +15,9 @@ def main():
     cap = initialise_camera()
     tracker = HandTracker()
 
+    # create a blank canvas for drawing
+    canvas = np.zeros((CAMERA_HEIGHT, CAMERA_WIDTH, 3), dtype=np.uint8)
+
     while True:
         success, frame = cap.read()
         if not success:
@@ -27,13 +31,20 @@ def main():
         # find and draw hands
         frame = tracker.find_hands(frame)
 
-        # get hand landmarks (for future gesture recognition)
-        landmarks = tracker.get_hand_position(frame)
+        index_finger = tracker.get_finger_position(frame, 8)
+
+        fingers_up = tracker.get_finger_up_status(frame)
+
+        if index_finger:
+            cv2.circle(frame, index_finger, 10, (0, 255, 0), cv2.FILLED)
         
-        # draw circle on indez fingetip if detected
-        if landmarks and len(landmarks) > 0:
-            index_finger_tip = landmarks[8]
-            cv2.circle(frame, (index_finger_tip[1], index_finger_tip[2]), 10, (0, 255, 0), cv2.FILLED)
+            finger_names = ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky']
+            y_pos = 30
+            for finger, is_up in zip(finger_names, fingers_up):
+                status = "Up" if is_up else "Down"
+                cv2.putText(frame, f"{finger}: {status}", (10, y_pos), 
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+                y_pos += 30
 
         cv2.imshow('AirCanvas', frame)
 
