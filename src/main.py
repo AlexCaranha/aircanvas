@@ -3,6 +3,7 @@ import numpy as np
 from config import *
 from hand_tracker import HandTracker
 from gesture import GestureRecogniser, GestureType
+from drawing import DrawingCanvas
 
 def initialise_camera():
     cap = cv2.VideoCapture(0)
@@ -16,9 +17,7 @@ def main():
     cap = initialise_camera()
     tracker = HandTracker()
     gesture_recogniser = GestureRecogniser()
-
-    # create a blank canvas for drawing
-    canvas = np.zeros((CAMERA_HEIGHT, CAMERA_WIDTH, 3), dtype=np.uint8)
+    canvas = DrawingCanvas(CAMERA_WIDTH, CAMERA_HEIGHT)
 
     while True:
         success, frame = cap.read()
@@ -36,26 +35,44 @@ def main():
 
         # recognise gesture
         gesture = gesture_recogniser.recognise_gesture(landmark_list)
+        index_finger = tracker.get_finger_position(frame, 8) if landmark_list else None
 
-        # Display gesture and debug info
-        if landmark_list:
-            # Draw gesture type
-            cv2.putText(frame, f"Gesture: {gesture.value}", (10, 30),
-                       cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-            
-            # Draw pinch distance
-            if len(landmark_list) > 8:
-                thumb_tip = next((x, y) for id, x, y in landmark_list if id == 4)
-                index_tip = next((x, y) for id, x, y in landmark_list if id == 8)
+
+        # Handle drawing actions
+        if index_finger:
+            if gesture == GestureType.DRAW:
+                if not canvas.drawing:
+                    canvas.start_drawing(index_finger)
+                else:
+                    canvas.draw(index_finger)
+                    
+            elif gesture == GestureType.ERASE:
+                canvas.set_tool("eraser")
+                if not canvas.drawing:
+                    canvas.start_drawing(index_finger)
+                else:
+                    canvas.draw(index_finger)
+                    
+            elif gesture == GestureType.SELECT:
+                # Tool selection will be implemented here
+                pass
                 
-                # Draw line between thumb and index
-                cv2.line(frame, thumb_tip, index_tip, (0, 255, 0), 2)
-                
-                # Calculate and display distance
-                distance = int(gesture_recogniser._calculate_distance(thumb_tip, index_tip))
-                mid_point = ((thumb_tip[0] + index_tip[0])//2, (thumb_tip[1] + index_tip[1])//2)
-                cv2.putText(frame, f"Dist: {distance}", mid_point,
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+            elif gesture == GestureType.CLEAR:
+                canvas.clear()
+            else:
+                canvas.stop_drawing()
+                canvas.set_tool("pen")  # Reset to pen when not drawing
+        
+        # Combine canvas with camera feed
+        drawing_display = canvas.get_display()
+        frame = cv2.addWeighted(frame, 1.0, drawing_display, 0.5, 0)
+        
+        # Add UI elements
+        cv2.putText(frame, f"Gesture: {gesture.value}", (10, 30),
+                   cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        cv2.putText(frame, f"Tool: {canvas.current_tool}", (10, 70),
+                   cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        
 
         cv2.imshow('AirCanvas', frame)
 
