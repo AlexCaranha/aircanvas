@@ -65,7 +65,7 @@ def main():
         
         # Combine canvas with camera feed
         drawing_display = canvas.get_display()
-        frame = cv2.addWeighted(frame, 1.0, drawing_display, 0.5, 0)
+        frame = cv2.addWeighted(frame, 1.0, drawing_display, 1.0, 0)
         
         # Add UI elements
         cv2.putText(frame, f"Gesture: {gesture.value}", (10, 30),
