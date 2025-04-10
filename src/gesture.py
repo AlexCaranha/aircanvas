@@ -10,7 +10,7 @@ class GestureType(Enum):
 
 class GestureRecogniser:
     def __init__(self):
-        self.pinch_threshold = 40
+        self.pinch_threshold = 100
         self.current_gesture = GestureType.NONE
 
     def recognise_gesture(self, landmark_list):
