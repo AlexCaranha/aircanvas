@@ -1,4 +1,5 @@
 from enum import Enum
+import math
 
 class GestureType(Enum):
     NONE = "none"
@@ -9,7 +10,7 @@ class GestureType(Enum):
 
 class GestureRecogniser:
     def __init__(self):
-        self.pinch_threshold = 30
+        self.pinch_threshold = 40
         self.current_gesture = GestureType.NONE
 
     def recognise_gesture(self, landmark_list):
@@ -18,23 +19,19 @@ class GestureRecogniser:
         
         landmarks = dict([(id, (x, y)) for id, x, y in landmark_list])
 
-        thumb_tip = landmarks.get(4)
-        index_tip = landmarks.get(8)
-        middle_tip = landmarks.get(12)
-        ring_tip = landmarks.get(16)
-        pinky_tip = landmarks.get(20)
+        fingers_extended = self._check_fingers_extended(landmarks)
 
-        thumb_base = landmarks.get(2)
-        index_base = landmarks.get(5)
-        middle_base = landmarks.get(9)
-        ring_base = landmarks.get(13)
-        pinky_base = landmarks.get(17)
+        # calculate pinch distance
+        pinch_distance = self._calculate_distance(
+            landmarks[4],
+            landmarks[8]
+        )
 
-        if not all([thumb_tip, index_tip, middle_tip, ring_tip, pinky_tip, thumb_base, index_base, middle_base, ring_base, pinky_base]):
-            return GestureType.NONE
+        # debug info
+        print(f"Pinch distance: {pinch_distance}")
+        print(f"Fingers extended: {fingers_extended}")
         
         # check for draw gesture
-        pinch_distance = self._calculate_distance(thumb_tip, index_tip)
         if pinch_distance < self.pinch_threshold:
             return GestureType.DRAW
         
@@ -44,24 +41,33 @@ class GestureRecogniser:
             return GestureType.ERASE
         
         # check for select gesture 
-        if (fingers_extended[1] and not any(fingers_extended[1:])):
+        if fingers_extended[1] and not any([fingers_extended[0], *fingers_extended[2:]]):
             return GestureType.SELECT
         
         # check for clear gesture
-        if (fingers_extended[0] and not any(fingers_extended[1:])):
+        if fingers_extended[0] and not any(fingers_extended[1:]):
             return GestureType.CLEAR
         
         return GestureType.NONE
 
     def _calculate_distance(self, point1, point2):
-        return ((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2) ** 0.5
+        return math.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
     
     def _check_fingers_extended(self, landmarks):
-        thumb_extended = landmarks[4][0] > landmarks[3][0]
+        # get palm center 
+        palm_x = sum(landmarks[i][0] for i in [0, 5, 9, 13, 17]) / 5
 
+        thumb_extended = landmarks[4][0] < palm_x
+
+        # Other fingers - compare y positions
         fingers = []
-        for tip, pip in [(8,6), (12,10), (16,14), (20,18)]:
-            finger_extended = landmarks[tip][1] < landmarks[pip][1]
+        for tip, mid, base in [(8,6,5), (12,10,9), (16,14,13), (20,18,17)]:  # Index to Pinky
+            finger_tip_y = landmarks[tip][1]
+            finger_base_y = landmarks[base][1]
+            finger_mid_y = landmarks[mid][1]
+
+            # A finger is extended if its tip is higher (smaller y) than both its mid and base points
+            finger_extended = finger_tip_y < finger_mid_y < finger_base_y
             fingers.append(finger_extended)
 
         return [thumb_extended] + fingers
