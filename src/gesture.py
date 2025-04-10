@@ -41,7 +41,7 @@ class GestureRecogniser:
             return GestureType.ERASE
         
         # check for select gesture 
-        if fingers_extended[1] and not any([fingers_extended[0], *fingers_extended[2:]]):
+        if self._is_select_gesture(landmarks, fingers_extended):
             return GestureType.SELECT
         
         # check for clear gesture
