@@ -61,7 +61,7 @@ class GestureRecogniser:
 
         fingers = []
         for tip, pip in [(8,6), (12,10), (16,14), (20,18)]:
-            finger_extended = landmarks[tip][1] < landmarks[pip[1]]
+            finger_extended = landmarks[tip][1] < landmarks[pip][1]
             fingers.append(finger_extended)
 
         return [thumb_extended] + fingers
