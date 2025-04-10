@@ -1,5 +1,6 @@
 from enum import Enum
 import math
+import time
 
 class GestureType(Enum):
     NONE = "none"
@@ -12,9 +13,16 @@ class GestureRecogniser:
     def __init__(self):
         self.pinch_threshold = 100
         self.current_gesture = GestureType.NONE
+        # clear gesture timing
+        self.clear_gesture_start = 0
+        self.clear_hold_time = 3.0
+        self.is_clear_gesture = False
 
     def recognise_gesture(self, landmark_list):
         if not landmark_list:
+            # reset clear gesture state when no hand detected
+            self.is_clear_gesture = False
+            self.clear_gesture_start = 0
             return GestureType.NONE
         
         landmarks = dict([(id, (x, y)) for id, x, y in landmark_list])
@@ -46,7 +54,18 @@ class GestureRecogniser:
         
         # check for clear gesture
         if fingers_extended[0] and not any(fingers_extended[1:]):
-            return GestureType.CLEAR
+            # Start timing if we just entered clear gesture
+            if not self.is_clear_gesture:
+                self.clear_gesture_start = time.time()
+                self.is_clear_gesture = True
+            
+            # Check if we've held the gesture long enough
+            if time.time() - self.clear_gesture_start >= self.clear_hold_time:
+                return GestureType.CLEAR
+        else:
+            # Reset clear gesture state if hand position changes
+            self.is_clear_gesture = False
+            self.clear_gesture_start = 0
         
         return GestureType.NONE
     
