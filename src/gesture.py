@@ -49,6 +49,34 @@ class GestureRecogniser:
             return GestureType.CLEAR
         
         return GestureType.NONE
+    
+    def _is_select_gesture(self, landmarks, fingers_extended):
+        index_extended = fingers_extended[1]
+
+        other_fingers_curled = not any([fingers_extended[2], fingers_extended[3], fingers_extended[4]])
+
+        # Check index finger angle (should be pointing upward)
+        index_tip = landmarks[8]    # Index tip
+        index_pip = landmarks[6]    # Index PIP (middle joint)
+        
+        # Calculate angle between index finger and vertical
+        dx = index_tip[0] - index_pip[0]
+        dy = index_tip[1] - index_pip[1]
+        angle = abs(math.degrees(math.atan2(dx, -dy)))  # Negative dy because y increases downward
+
+        # Check if index is relatively straight and vertical
+        is_vertical = angle < 30  # Allow 30 degrees deviation from vertical
+
+        # Check if index is above other fingers
+        index_tip_y = landmarks[8][1]
+        other_tips_y = [landmarks[i][1] for i in [12, 16, 20]]  # Middle, Ring, Pinky tips
+        is_highest = all(index_tip_y < y for y in other_tips_y)
+                         
+        # Combined conditions for SELECT gesture
+        return (index_extended and 
+                other_fingers_curled and 
+                is_vertical and 
+                is_highest)
 
     def _calculate_distance(self, point1, point2):
         return math.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
