@@ -78,7 +78,7 @@ class HandTracker:
         if finger_id in self.prev_positions:
             # simple exponential smoothing
             alpha = 0.5
-            smooth_x = int(alpha * finger_pos[0] + (1 - alpha) * self.prev_positions[finger_id[0]])
+            smooth_x = int(alpha * finger_pos[0] + (1 - alpha) * self.prev_positions[finger_id][0])
             smooth_y = int(alpha * finger_pos[1] + (1 - alpha) * self.prev_positions[finger_id][1])
             finger_pos = (smooth_x, smooth_y)
 
