@@ -47,6 +47,14 @@ def main():
                     canvas.draw(index_finger)
                     
             elif gesture == GestureType.ERASE:
+                # Draw eraser preview circle
+                cv2.circle(frame, 
+                          index_finger, 
+                          canvas.eraser_thickness // 2,  # Radius is half the thickness
+                          (255, 0, 0),  # Red color for eraser
+                          2)  # Circle thickness
+                
+                # Handle eraser drawing
                 canvas.set_tool("eraser")
                 if not canvas.drawing:
                     canvas.start_drawing(index_finger)
