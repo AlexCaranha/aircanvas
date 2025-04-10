@@ -37,22 +37,25 @@ def main():
         # recognise gesture
         gesture = gesture_recogniser.recognise_gesture(landmark_list)
 
-        # display gesture info
-        cv2.putText(frame, f"Gesture: {gesture.value}", (10, 30),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-
-        index_finger = tracker.get_finger_position(frame, 8)
-        if index_finger:
-            # Draw circle at finger position with color based on gesture
-            color = {
-                GestureType.DRAW: (0, 255, 0),    # Green
-                GestureType.ERASE: (0, 0, 255),   # Red
-                GestureType.SELECT: (255, 0, 0),  # Blue
-                GestureType.CLEAR: (0, 255, 255), # Yellow
-                GestureType.NONE: (128, 128, 128) # Gray
-            }[gesture]
+        # Display gesture and debug info
+        if landmark_list:
+            # Draw gesture type
+            cv2.putText(frame, f"Gesture: {gesture.value}", (10, 30),
+                       cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
             
-            cv2.circle(frame, index_finger, 10, color, cv2.FILLED)
+            # Draw pinch distance
+            if len(landmark_list) > 8:
+                thumb_tip = next((x, y) for id, x, y in landmark_list if id == 4)
+                index_tip = next((x, y) for id, x, y in landmark_list if id == 8)
+                
+                # Draw line between thumb and index
+                cv2.line(frame, thumb_tip, index_tip, (0, 255, 0), 2)
+                
+                # Calculate and display distance
+                distance = int(gesture_recogniser._calculate_distance(thumb_tip, index_tip))
+                mid_point = ((thumb_tip[0] + index_tip[0])//2, (thumb_tip[1] + index_tip[1])//2)
+                cv2.putText(frame, f"Dist: {distance}", mid_point,
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
         cv2.imshow('AirCanvas', frame)
 
