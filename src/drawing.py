@@ -8,7 +8,7 @@ class DrawingCanvas:
 
         self.colour = (0, 0, 255) 
         self.thickness = 10
-        self.eraser_thickness = 50
+        self.eraser_thickness = 200
 
         self.current_tool = "pen"
         self.drawing = False

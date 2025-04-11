@@ -11,7 +11,7 @@ class GestureType(Enum):
 
 class GestureRecogniser:
     def __init__(self):
-        self.pinch_threshold = 100
+        self.pinch_threshold = 75
         self.current_gesture = GestureType.NONE
         # clear gesture timing
         self.clear_gesture_start = 0
@@ -52,20 +52,20 @@ class GestureRecogniser:
         if self._is_select_gesture(landmarks, fingers_extended):
             return GestureType.SELECT
         
-        # check for clear gesture
-        if fingers_extended[0] and not any(fingers_extended[1:]):
-            # Start timing if we just entered clear gesture
-            if not self.is_clear_gesture:
-                self.clear_gesture_start = time.time()
-                self.is_clear_gesture = True
+        # # check for clear gesture
+        # if fingers_extended[0] and not any(fingers_extended[1:]):
+        #     # Start timing if we just entered clear gesture
+        #     if not self.is_clear_gesture:
+        #         self.clear_gesture_start = time.time()
+        #         self.is_clear_gesture = True
             
-            # Check if we've held the gesture long enough
-            if time.time() - self.clear_gesture_start >= self.clear_hold_time:
-                return GestureType.CLEAR
-        else:
-            # Reset clear gesture state if hand position changes
-            self.is_clear_gesture = False
-            self.clear_gesture_start = 0
+        #     # Check if we've held the gesture long enough
+        #     if time.time() - self.clear_gesture_start >= self.clear_hold_time:
+        #         return GestureType.CLEAR
+        # else:
+        #     # Reset clear gesture state if hand position changes
+        #     self.is_clear_gesture = False
+        #     self.clear_gesture_start = 0
         
         return GestureType.NONE
     
