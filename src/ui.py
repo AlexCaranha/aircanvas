@@ -9,14 +9,13 @@ class UIManager:
         # BGR values
         self.colours = {
             "red": (0, 0, 255),
-            "blue": (255, 0, 0),
-            "green": (0, 255, 0),
+            "blue": (230, 180, 40),
+            "green": (20, 180, 50),
             "yellow": (0, 255, 255),
-            "black": (0, 0, 0),
             "white": (255, 255, 255)
         }
         
-        self.box_size = 60
+        self.box_size = 120
         self.margin = 20
         self.selected_colour = "red"  # Default red
         
