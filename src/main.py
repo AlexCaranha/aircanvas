@@ -4,6 +4,7 @@ from config import *
 from hand_tracker import HandTracker
 from gesture import GestureRecogniser, GestureType
 from drawing import DrawingCanvas
+from ui import UIManager
 
 def initialise_camera():
     cap = cv2.VideoCapture(0)
@@ -18,7 +19,11 @@ def main():
     tracker = HandTracker()
     gesture_recogniser = GestureRecogniser()
     canvas = DrawingCanvas(CAMERA_WIDTH, CAMERA_HEIGHT)
-
+    ui_manager = UIManager(CAMERA_WIDTH, CAMERA_HEIGHT)
+    
+    # Set initial colour
+    canvas.set_colour(ui_manager.selected_colour)
+    
     while True:
         success, frame = cap.read()
         if not success:
@@ -36,41 +41,52 @@ def main():
         # recognise gesture
         gesture = gesture_recogniser.recognise_gesture(landmark_list)
         index_finger = tracker.get_finger_position(frame, 8) if landmark_list else None
-
-
+        
         # Handle drawing actions
         if index_finger:
-            if gesture == GestureType.DRAW:
+            if gesture == GestureType.SELECT:
+                # Reset to pen when selecting
+                canvas.set_tool("pen")
+                
+                # Handle colour selection
+                colour_selected, colour_name = ui_manager.handle_selection(index_finger)
+                if colour_selected:
+                    canvas.set_colour(colour_name)
+                    print(f"Selected colour: {colour_name}")
+                
+                canvas.stop_drawing()
+                    
+            elif gesture == GestureType.DRAW:
+                # Ensure we're using pen tool
+                canvas.set_tool("pen")
+                
                 if not canvas.drawing:
                     canvas.start_drawing(index_finger)
                 else:
                     canvas.draw(index_finger)
                     
             elif gesture == GestureType.ERASE:
-                # Draw eraser preview circle
-                cv2.circle(frame, 
-                          index_finger, 
-                          canvas.eraser_thickness // 2,  # Radius is half the thickness
-                          (255, 0, 0),  # Red color for eraser
-                          2)  # Circle thickness
-                
-                # Handle eraser drawing
+                # Switch to eraser tool
                 canvas.set_tool("eraser")
+    
+                # Draw eraser circle preview around finger
+                cv2.circle(frame, 
+                    index_finger, 
+                    canvas.eraser_thickness // 2,  # Radius is half the thickness
+                    (255, 0, 0),  # Blue circle
+                    2)  # Line thickness
+    
                 if not canvas.drawing:
                     canvas.start_drawing(index_finger)
                 else:
                     canvas.draw(index_finger)
-                    
-            elif gesture == GestureType.SELECT:
-                # Tool selection will be implemented here
-                pass
-                
-            elif gesture == GestureType.CLEAR:
-                canvas.clear()
             else:
+                # Stop drawing for any other gesture
                 canvas.stop_drawing()
-                canvas.set_tool("pen")  # Reset to pen when not drawing
-        
+        else:
+            # No hand detected, stop drawing
+            canvas.stop_drawing()
+                
         # Combine canvas with camera feed
         # Draw canvas content
         drawing_display = canvas.get_display()
@@ -84,11 +100,13 @@ def main():
         frame = cv2.add(frame_bg, drawing_fg)
         
         # Add UI elements
-        cv2.putText(frame, f"Gesture: {gesture.value}", (10, 30),
-                   cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-        cv2.putText(frame, f"Tool: {canvas.current_tool}", (10, 70),
-                   cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        ui_manager.draw(frame)
         
+        if landmark_list:
+            cv2.putText(frame, f"Gesture: {gesture.value}", (10, CAMERA_HEIGHT - 60),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+            cv2.putText(frame, f"Tool: {canvas.current_tool}", (10, CAMERA_HEIGHT - 30),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
         cv2.imshow('AirCanvas', frame)
 
