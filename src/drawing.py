@@ -18,8 +18,8 @@ class DrawingCanvas:
         # Current drawing settings
         self.current_colour_name = "red"
         self.current_colour = self.colours["red"]
-        self.thickness = 25
-        self.eraser_thickness = 200
+        self.thickness = 15
+        self.eraser_thickness = 125
         self.current_tool = "pen"
         self.drawing = False
         self.start_point = None
