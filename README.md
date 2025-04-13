@@ -20,7 +20,7 @@ The project demonstrates how computer vision can be used to create natural human
 ### Setup
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/aircanvas.git
+   git clone https://github.com/d4min/aircanvas.git
    cd aircanvas
    ```
 
