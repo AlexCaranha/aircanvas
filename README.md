@@ -52,13 +52,21 @@ AirCanvas recognises different hand gestures to control drawing functions:
 
 Make a pinch gesture with your index finger and thumb to draw. Move your hand while maintaining the pinch to create lines and shapes.
 
+![Demonstration of Pinch Gesture](images/pinch.png)
+
 ### Select Gesture
 
 Point with your index finger to select colors from the palette on the right side of the screen.
 
+![Demonstration of Select Gesture](images/select.png)
+
+
 ### Erase Gesture
 
 Show an open palm to erase. A circle will appear around your index finger showing the eraser size.
+
+![Demonstration of Erase Gesture](images/erase.png)
+
 
 ### Controls and Features
 - **Colour Palette**: Located on the right side of the screen
