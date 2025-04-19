@@ -85,7 +85,7 @@ AirCanvas includes an audio recognition feature that allows you to control the a
 The audio recognition runs in a separate thread, allowing it to listen for commands continuously while you draw.
 
 #### Contributor Acknowledgment
-Special thanks to [@AlexCarhana](https://github.com/AlexCarhana) for implementing the speech recognition functionality.
+Special thanks to [@AlexCaranha](https://github.com/AlexCaranha) for implementing the speech recognition functionality.
 
 ## Implementation Progress
 
