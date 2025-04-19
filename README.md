@@ -98,6 +98,7 @@ Show an open palm to erase. A circle will appear around your index finger showin
 - [x] Color system
 
 ### Phase 5: Features ⏳
+- [x] Audio commands: colors (red, blue, green, yellow and white), clear and exit.
 - [ ] Tool panel
 - [ ] Save/Load system
 - [ ] Shapes e.g. Rectangle, Circle
