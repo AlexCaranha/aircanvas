@@ -73,6 +73,20 @@ Show an open palm to erase. A circle will appear around your index finger showin
 - **Current Colour**: Displayed in the top-left corner
 - **Exit**: Press 'q' to quit the application
 
+### Audio Recognition 
+
+AirCanvas includes an audio recognition feature that allows you to control the application using voice commands. This feature leverages the `speech_recognition` library to interpret spoken words and execute corresponding actions within the application.
+
+### Supported Commands
+- **"Clear"**: Clears the canvas.
+- **"Exit"**: Closes the application.
+- **"Blue", "Red", "Green", "Yellow", "White"**: Changes the drawing color to the specified color.
+
+The audio recognition runs in a separate thread, allowing it to listen for commands continuously while you draw.
+
+#### Contributor Acknowledgment
+Special thanks to [@AlexCarhana](https://github.com/AlexCarhana) for implementing the speech recognition functionality.
+
 ## Implementation Progress
 
 ### Phase 1: Setup ✅
@@ -97,8 +111,8 @@ Show an open palm to erase. A circle will appear around your index finger showin
 - [x] Drawing implementation
 - [x] Color system
 
-### Phase 5: Features ⏳
-- [x] Audio commands: colors (red, blue, green, yellow and white), clear and exit.
+### Phase 5: Features 🔄
+- [x] Audio commands
 - [ ] Tool panel
 - [ ] Save/Load system
 - [ ] Shapes e.g. Rectangle, Circle
